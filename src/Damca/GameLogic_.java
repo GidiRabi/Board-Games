@@ -159,17 +159,8 @@ public class GameLogic_ implements PlayableLogic_ {
 
     }
 
-    /**
-     * Try to move a piece from position a to position b.
-     * if the move is valid, update the board, the tracker, the turns history, the piece moves list, and the turn_ owner.
-     *
-     * @param a The starting position of the piece.
-     * @param b The destination position for the piece.
-     * @return true if the move was successful, false otherwise
-     */
     @Override
     public boolean move(Position_ a, Position_ b) {
-        // check if a and b are in the board
         checkIfPositionIsInBoard(a);
         checkIfPositionIsInBoard(b);
 
@@ -187,42 +178,77 @@ public class GameLogic_ implements PlayableLogic_ {
         if (a.equals(b))
             return false;
 
-        //eating player
-        /**
-         * CHECK IF HES NOT ON THE EDGE OF THE GAME OR 1 NEAR THE EDGE
+        //check if its a pawn or a king and activates the right function
+        if(!piece.isPromoted()){
+            return movePawn(a, b);
+        }else{
+            return moveKing(a, b);
+        }
+    }
+
+    private boolean moveKing(Position_ a, Position_ b) {
+
+
+        if (Math.abs(a.col() - a.row()) != Math.abs(b.col()) - b.row()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+         * Try to move a piece from position a to position b.
+         * if the move is valid, update the board, the tracker, the turns history, the piece moves list, and the turn_ owner.
+         *
+         * @param a The starting position of the piece.
+         * @param b The destination position for the piece.
+         * @return true if the move was successful, false otherwise
          */
+    public boolean movePawn(Position_ a, Position_ b) {
+
+        ConcretePiece_ piece = board[a.row()][a.col()];
+        Player_ currentPlayer = isSecondPlayerTurn() ? secondPlayer : firstPlayer;
+
+
+
+        //eating player
         if(a.col() == b.col() - 2 || a.col() == b.col() + 2) {
             if (board[b.row()][b.col()] == null) {
                 if (isSecondPlayerTurn()) {
-                    if (board[a.row() + 1][a.col() -1] != null && board[a.row() + 1][a.col() -1].owner == firstPlayer) {
-                        board[a.row() + 1][a.col() -1] = null;
+                    if (a.col() - 1 > 0 && board[a.row() + 1][a.col() -1] != null && board[a.row() + 1][a.col() -1].owner == firstPlayer) {
+                        board[a.col() + 1][a.col() -1] = null;
                         board[b.row()][b.col()] = board[a.row()][a.col()];
                         board[a.row()][a.col()] = null;
                         secondPlayerTurn = !secondPlayerTurn;
                         updateGameStats();
+                        checkKing(b);
                         return true;
-                    }else if(board[a.row() + 1][a.col() +1] != null && board[a.row() + 1][a.col() +1].owner == firstPlayer){
+                    }else if(a.col() + 1 < 8 && board[a.row() + 1][a.col() +1] != null && board[a.row() + 1][a.col() +1].owner == firstPlayer){
                         board[a.row() + 1][a.col() +1] = null;
                         board[b.row()][b.col()] = board[a.row()][a.col()];
                         board[a.row()][a.col()] = null;
                         secondPlayerTurn = !secondPlayerTurn;
                         updateGameStats();
+                        checkKing(b);
                         return true;
                     }
                 } else {
-                    if (board[a.row() - 1][a.col() -1] != null && board[a.row() - 1][a.col() -1].owner == secondPlayer) {
+                    if (a.col() - 1 > 0 && board[a.row() - 1][a.col() -1] != null && board[a.row() - 1][a.col() -1].owner == secondPlayer) {
                         board[a.row() - 1][a.col() -1] = null;
                         board[b.row()][b.col()] = board[a.row()][a.col()];
                         board[a.row()][a.col()] = null;
                         secondPlayerTurn = !secondPlayerTurn;
                         updateGameStats();
+                        checkKing(b);
                         return true;
-                    }else if(board[a.row() - 1][a.col() +1] != null && board[a.row() - 1][a.col() +1].owner == secondPlayer){
+                    }else if(a.col() + 1 < 8 && board[a.row() - 1][a.col() +1] != null && board[a.row() - 1][a.col() +1].owner == secondPlayer){
                         board[a.row() - 1][a.col() +1] = null;
                         board[b.row()][b.col()] = board[a.row()][a.col()];
                         board[a.row()][a.col()] = null;
                         secondPlayerTurn = !secondPlayerTurn;
                         updateGameStats();
+                        checkKing(b);
                         return true;
                     }
                 }
@@ -230,39 +256,27 @@ public class GameLogic_ implements PlayableLogic_ {
             }
         }
 
-
-//        if(!(piece instanceof King_))
-
-
-
-        if(!(piece instanceof King_)){
-
-            if(!(a.col() + 1 == b.col()  || a.col() - 1 == b.col())){
+        if(!(a.col() + 1 == b.col()  || a.col() - 1 == b.col())){
+            return false;
+        }
+        if(isSecondPlayerTurn()) {
+            if (!(b.row() - 1 == a.row())) {
                 return false;
             }
-            if(isSecondPlayerTurn()) {
-                if (!(b.row() - 1 == a.row())) {
-                    return false;
-                }
+        }else {
+            if (!(b.row() + 1 == a.row())) {
+                return false;
             }
-            if(!isSecondPlayerTurn()) {
-                if (!(b.row() + 1 == a.row())) {
-                    return false;
-                }
-            }
-        } else {
-                if (Math.abs(a.col() - a.row()) != Math.abs(b.col()) - b.row()) {
-                    return false;
-                }
         }
 
-        if(piece instanceof Pawn_) {
-            //if theres nothing in that position move him there
+
+         //if there's nothing in that position move him there
             if (board[b.row()][b.col()] == null) {
                 board[b.row()][b.col()] = piece;
                 board[a.row()][a.col()] = null;
                 secondPlayerTurn = !secondPlayerTurn;
                 updateGameStats();
+                checkKing(b);
                 return true;
             }
                 //if theres an ally in that position do nothing
@@ -274,27 +288,21 @@ public class GameLogic_ implements PlayableLogic_ {
                     return false;
                 }
 
-
-
-        }
-
         return true;
     }
 
-//    public boolean checkIfKing(Position_ pos){
-//        //if its second player then he should be on bottom row, first player should be top row
-//        if(isSecondPlayerTurn() && board[pos.row()][pos.col()].owner == secondPlayer){
-//            if(pos.row() == 0){
-//                board[pos.row()][pos.col()] = null;
-////                ConcretePiece_[pos.row()][pos.col()] = new King_(secondPlayer,board[pos.row()][pos.col()].getPieceNum() , pos);
-//                putPawnOnBoard(1, new Position_(0, 7), firstPlayer);
-//            }
-//        } else if(!isSecondPlayerTurn() && board[pos.row()][pos.col()].owner == firstPlayer){
-//            if(pos.row() == 7){
-//
-//            }
-//        }
-//    }
+
+    /**
+     * Check if the piece reached the last row of the board, and if it is, replace it with a king.
+     * @param pos
+     */
+    public void checkKing(Position_ pos){
+        if(pos.row() == 0 || pos.row() == 7){
+            GUI_for_chess_like_games_ gui = GUI_for_chess_like_games_.getInstance();
+            gui.promote(pos);
+            board[pos.col()][pos.row()].promote();
+        }
+    }
 
 
     /**
@@ -444,14 +452,10 @@ public class GameLogic_ implements PlayableLogic_ {
             pieceToNumOfStep.put(piece, pieceToNumOfStep.get(piece) - 1); // remove 1 from the number of times that the piece was in the cell
         }
 
-        // update the king_ position
-        if (piece instanceof King_)
-            kingPosition = lastTurn.getFrom();
-
-
         // update the turn_ owner
         secondPlayerTurn = !secondPlayerTurn;
     }
+
 
     /**
      * @return the size of the board

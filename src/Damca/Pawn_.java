@@ -1,8 +1,10 @@
 package Damca;
 
 public class Pawn_ extends ConcretePiece_ {
-    private static final String PLAYER_ONE_TYPE = "♙";
-    private static final String PLAYER_TWO_TYPE = "♟";
+    private static String PLAYER_ONE_TYPE = "♙";
+    private static String PLAYER_TWO_TYPE = "♟";
+    private static String PLAYER_ONE_PROMOTED_TYPE = "♔";
+    private static String PLAYER_TWO_PROMOTED_TYPE = "♛";
 
     private int numberOfEatenPawns;
 
@@ -11,11 +13,24 @@ public class Pawn_ extends ConcretePiece_ {
         this.numberOfEatenPawns = 0;
     }
 
+    public String getType() {
+        if (isPromoted) {
+            return getOwner().isPlayerOne() ? PLAYER_ONE_PROMOTED_TYPE : PLAYER_TWO_PROMOTED_TYPE;
+        }else {
+            return getOwner().isPlayerOne() ? PLAYER_ONE_TYPE : PLAYER_TWO_TYPE;
+        }
+    }
 
     @Override
-    public String getType() {
-        return getOwner().isPlayerOne() ? PLAYER_ONE_TYPE : PLAYER_TWO_TYPE;
+    public void setType(String type) {
+
     }
+
+    public void promote() {
+        this.isPromoted = true;
+    }
+
+
 
     /**
      * Increment the number of eaten pawns by 1.

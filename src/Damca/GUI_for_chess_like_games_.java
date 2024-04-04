@@ -25,7 +25,19 @@ public class GUI_for_chess_like_games_ extends JFrame {
      *
      * @param gameLogic The game logic instance that controls the game's logic and state.
      */
-    public GUI_for_chess_like_games_(PlayableLogic_ gameLogic, String title) {
+    //make it a singleton
+    public static GUI_for_chess_like_games_ instance = null;
+
+
+    public static GUI_for_chess_like_games_ getInstance(PlayableLogic_ gameLogic, String title) {
+        if (instance == null) {
+            instance = new GUI_for_chess_like_games_(gameLogic, title);
+        }
+        return instance;
+    }
+
+
+    private GUI_for_chess_like_games_(PlayableLogic_ gameLogic, String title) {
         this.gameLogic = gameLogic;
         this.BOARD_SIZE = gameLogic.getBoardSize();
         setTitle(title);
@@ -65,12 +77,17 @@ public class GUI_for_chess_like_games_ extends JFrame {
 
     }
 
+    public static GUI_for_chess_like_games_ getInstance() {
+        return instance;
+    }
+
     /**
      * This function is called when two different buttons are pressed, one after the other.
      * @param srcPosition The source piece position_
      * @param destPosition The destination piece position_
      */
     private void twoButtonsListener(Position_ srcPosition, Position_ destPosition) {
+
         if (gameLogic.move(srcPosition, destPosition)) {
             updateBoard();
 
@@ -122,6 +139,17 @@ public class GUI_for_chess_like_games_ extends JFrame {
     private void updateWinsLabels(int attackerWins, int defenderWins) {
         playerTowWinsLabel.setText("♟ Player 2 Wins: " + attackerWins);
         playerOneWinsLabel.setText("♙ Player 1 Wins: " + defenderWins);
+    }
+
+    public void promote(Position_ pos) {
+        if(gameLogic.isSecondPlayerTurn()) {
+            System.out.println(buttons[pos.col()][pos.row()].getText());
+            buttons[pos.col()][pos.row()].setText("♔");
+        }
+        else{
+            buttons[pos.col()][pos.row()].setText("♛");
+        }
+        updateBoard();
     }
 
     /**
@@ -222,5 +250,9 @@ public class GUI_for_chess_like_games_ extends JFrame {
             selectedButton.setBackground(selectedColor);
             selectedButton = null;
         }
+    }
+
+    public JFrame getFrame() {
+        return this; // Return the current instance of JFrame
     }
 }

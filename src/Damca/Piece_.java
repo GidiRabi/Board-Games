@@ -23,5 +23,15 @@ public interface Piece_ {
      *
      */
     String getType();
+
+    /**
+     * Set a Unicode character representing the type of the game piece.
+     *  <a href="https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode">...</a>
+     * @return A Unicode character representing the type of this game piece
+     *         (e.g., ♟ for pawn, ♞ for knight, ♜ for rook, etc.).
+     *
+     */
+    void setType(String type);
+
 }
 

@@ -222,4 +222,8 @@ public class GUI_for_chess_like_games extends JFrame {
             selectedButton = null;
         }
     }
+
+    public JFrame getFrame() {
+        return this; // Return the current instance of JFrame
+    }
 }

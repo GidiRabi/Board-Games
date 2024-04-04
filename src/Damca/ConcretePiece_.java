@@ -9,6 +9,14 @@ public abstract class ConcretePiece_ implements Piece_ {
     protected final int pieceNum;
     protected int distance;
     protected int kills;
+    protected boolean isPromoted;
+
+    private static String PLAYER_ONE_TYPE = "♙";
+    private static String PLAYER_TWO_TYPE = "♟";
+    private static String PLAYER_ONE_PROMOTED_TYPE = "♔";
+    private static String PLAYER_TWO_PROMOTED_TYPE = "♛";
+
+
 
     public ConcretePiece_(Player_ owner, int pieceNum, Position_ initialPosition) {
         this.owner = owner;
@@ -64,5 +72,18 @@ public abstract class ConcretePiece_ implements Piece_ {
         return pieceNum;
     }
 
+    public String getType() {
+        if (isPromoted) {
+            return getOwner().isPlayerOne() ? PLAYER_ONE_PROMOTED_TYPE : PLAYER_TWO_PROMOTED_TYPE;
+        }else {
+            return getOwner().isPlayerOne() ? PLAYER_ONE_TYPE : PLAYER_TWO_TYPE;
+        }
+    }
+    public void promote() {
+        this.isPromoted = true;
+    }
 
+    public boolean isPromoted() {
+        return isPromoted;
+    }
 }
